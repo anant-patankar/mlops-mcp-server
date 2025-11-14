@@ -1,0 +1,76 @@
+[project]
+name = "mlops-mcp-server"
+version = "0.1.0"
+description = "MCP server for common MLOps workflows"
+readme = "README.md"
+
+authors = [
+    { name = "Anant Patankar", email = "patankar.anant123@gmail.com" }
+]
+
+requires-python = ">=3.13"
+
+dependencies = [
+    "deepdiff>=8.6.1",
+    "fastmcp>=3.0.1",
+    "gitpython>=3.1.46",
+    "pandas>=3.0.1",
+    "pathspec>=1.0.4",
+    "pyarrow>=23.0.1",
+    "pydantic>=2.12.5",
+    "pyyaml>=6.0.3",
+]
+
+[project.scripts]
+mlops-mcp-server = "mlops_mcp.__main__:main"
+
+[project.optional-dependencies]
+mlflow = [
+    "mlflow>=1.27.0",
+]
+
+models = [
+    "joblib>=1.5.3",
+    "onnx>=1.20.1",
+    "safetensors>=0.7.0",
+]
+
+validation = [
+    "pandera>=0.29.0",
+    "scipy>=1.17.0",
+]
+
+templates = [
+    "jinja2>=3.1.6",
+]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.15.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.mypy]
+python_version = "3.13"
+strict = false
+mypy_path = "src"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mlops_mcp"]
