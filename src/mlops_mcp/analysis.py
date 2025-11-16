@@ -244,7 +244,7 @@ def get_dataset_stats(data_path: str) -> dict[str, Any]:
                 "rows": table.num_rows,
                 "columns": table.num_columns,
                 "column_names": table.column_names,
-                "dtypes": [str(field.type) for field in table.schema],
+                "dtypes": {field.name: str(field.type) for field in table.schema},
             }
         except OSError as exc:
             return err(str(exc))
@@ -278,3 +278,140 @@ def get_dataset_stats(data_path: str) -> dict[str, Any]:
         }
     except (ValueError, OSError) as exc:
         return err(str(exc))
+
+
+def detect_model_framework(model_path: str) -> dict[str, Any]:
+    target_path = Path(model_path)
+    if not target_path.exists() or not target_path.is_file():
+        return err(f"model file not found: {target_path}")
+
+    ext = target_path.suffix.lower()
+    if ext in {".pt", ".pth", ".ckpt"}:
+        framework = "pytorch"
+    elif ext in {".pb", ".savedmodel"}:
+        framework = "tensorflow"
+    elif ext == ".onnx":
+        framework = "onnx"
+    elif ext in {".joblib", ".pkl"}:
+        framework = "sklearn"
+    elif ext == ".safetensors":
+        framework = "safetensors"
+    else:
+        framework = "unknown"
+
+    return {
+        "success": True,
+        "path": str(target_path.resolve()),
+        "framework": framework,
+        "extension": ext,
+    }
+
+
+def compare_files(path_a: str, path_b: str) -> dict[str, Any]:
+    try:
+        file_a = Path(path_a)
+        file_b = Path(path_b)
+        if not file_a.exists() or not file_a.is_file():
+            return err(f"file not found: {file_a}")
+        if not file_b.exists() or not file_b.is_file():
+            return err(f"file not found: {file_b}")
+
+        text_a = file_a.read_text(encoding="utf-8").splitlines()
+        text_b = file_b.read_text(encoding="utf-8").splitlines()
+        diff_lines = list(
+            unified_diff(
+                text_a, text_b,
+                fromfile=str(file_a), tofile=str(file_b),
+                lineterm="",
+            )
+        )
+        added   = sum(1 for l in diff_lines if l.startswith("+") and not l.startswith("+++"))
+        removed = sum(1 for l in diff_lines if l.startswith("-") and not l.startswith("---"))
+        return {
+            "success":    True,
+            "path_a":     str(file_a.resolve()),
+            "path_b":     str(file_b.resolve()),
+            "identical":  not bool(diff_lines),
+            "diff_lines": diff_lines,
+            "added":      added,
+            "removed":    removed,
+        }
+    except (OSError, UnicodeDecodeError) as exc:
+        return err(str(exc))
+    
+
+def compare_directories(path_a: str, path_b: str) -> dict[str, Any]:
+    try:
+        dir_a = Path(path_a)
+        dir_b = Path(path_b)
+        if not dir_a.exists() or not dir_a.is_dir():
+            return err(f"directory not found: {dir_a}")
+        if not dir_b.exists() or not dir_b.is_dir():
+            return err(f"directory not found: {dir_b}")
+
+        files_a = {
+            str(item.relative_to(dir_a)): item
+            for item in dir_a.rglob("*")
+            if item.is_file()
+        }
+        files_b = {
+            str(item.relative_to(dir_b)): item
+            for item in dir_b.rglob("*")
+            if item.is_file()
+        }
+
+        set_a = set(files_a)
+        set_b = set(files_b)
+
+        only_in_a = sorted(set_a - set_b)
+        only_in_b = sorted(set_b - set_a)
+        shared = sorted(set_a & set_b)
+
+        different_content: list[str] = []
+        for rel in shared:
+            if _hash_file(files_a[rel]) != _hash_file(files_b[rel]):
+                different_content.append(rel)
+
+        return {
+            "success": True,
+            "path_a": str(dir_a.resolve()), "path_b": str(dir_b.resolve()),
+            "only_in_a": only_in_a, "only_in_b": only_in_b,
+            "different_content": sorted(different_content),
+        }
+    except OSError as exc:
+        return err(str(exc))
+
+def get_notebook_summary(path: str) -> dict[str, Any]:
+    try:
+        import nbformat
+    except ImportError:
+        return err("nbformat not installed")
+
+    target = Path(path)
+    if not target.exists() or not target.is_file():
+        return err(f"notebook file not found: {target}")
+
+    try:
+        notebook = nbformat.read(target, as_version=4)
+    except OSError as exc:
+        return err(str(exc))
+
+    code_cells = 0
+    markdown_cells = 0
+    last_exec = None
+    for cell in notebook.cells:
+        if cell.cell_type == "code":
+            code_cells += 1
+            if cell.get("execution_count") is not None:
+                last_exec = cell["execution_count"]
+        elif cell.cell_type == "markdown":
+            markdown_cells += 1
+
+    return {
+        "success": True,
+        "path": str(target.resolve()),
+        "cell_count": len(notebook.cells),
+        "code_cells": code_cells,
+        "markdown_cells": markdown_cells,
+        "last_execution_count": last_exec,
+    }

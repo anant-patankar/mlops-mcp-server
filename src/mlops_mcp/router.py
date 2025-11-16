@@ -20,6 +20,17 @@ from .fileops import (
     search_files, write_file,
     )
 
+from .analysis import (
+    analysis_directory, batch_classify, classify_file, compare_directories,
+    compare_files,
+    detect_model_framework,
+    find_duplicate_files,
+    get_dataset_stats,
+    get_file_info,
+    get_notebook_summary,
+    storage_report,
+)
+
 
 @dataclass(frozen=True)
 class ToolDefinition:
@@ -35,10 +46,12 @@ _RUNTIME_REGISTERED_TOOLS: set[str] = set()
 _APP: FastMCP | None = None
 _TIER_ONE_TOOLS = {
     "file_read", "file_write", "file_list", "file_search",
+    "analysis_directory", "storage_report",
     }
 
 _MODULE_META: dict[str, dict[str, Any]] = {
     "fileops": {"tool_count": 14, "description": "Core file operations for ML projects."},
+    "analysis": {"tool_count": 11, "description": "File analysis and ML-aware classification."},
     }
 
 TOOL_REGISTRY: dict[str, list[ToolDefinition]] = {
@@ -71,8 +84,31 @@ TOOL_REGISTRY: dict[str, list[ToolDefinition]] = {
                        ("batch-delete",), batch_delete),
         ToolDefinition("get_operation_history", "Returns file operation history. Use for: audit trace. Do NOT use for: git history.",
                        ("audit",), get_operation_history),
-                       
                        ],
+    "analysis": [
+        ToolDefinition("get_file_info", "Returns file metadata and checksum. Use for: file inspection. Do NOT use for: directory summaries.",
+                       ("file-info",), get_file_info),
+        ToolDefinition("classify_file", "Classifies file by ML-aware type. Use for: routing workflows. Do NOT use for: content validation.",
+                       ("file-classify",), classify_file),
+        ToolDefinition("analysis_directory", "Summarizes directory composition. Use for: project scans. Do NOT use for: exact lineage tracing.",
+                       ("dir-summary",), analysis_directory),
+        ToolDefinition("find_duplicate_files", "Finds duplicate files by hash. Use for: storage cleanup prep. Do NOT use for: near-duplicate detection.",
+                       ("dedupe",), find_duplicate_files),
+        ToolDefinition("storage_report", "Reports largest files and storage use. Use for: disk planning. Do NOT use for: git diffing.",
+                       ("storage",), storage_report),
+        ToolDefinition("batch_classify", "Classifies many file paths in one call. Use for: bulk audits. Do NOT use for: mutation operations.",
+                       ("bulk-classify",), batch_classify),
+        ToolDefinition("get_dataset_stats", "Profiles one dataset file. Use for: training readiness checks. Do NOT use for: schema contract checks.",
+                       ("dataset-stats",), get_dataset_stats),
+        ToolDefinition("detect_model_framework", "Detects model framework from file. Use for: runner selection. Do NOT use for: model quality assessment.",
+                       ("framework-detect",), detect_model_framework),
+        ToolDefinition("get_notebook_summary", "Summarizes notebook structure. Use for: notebook audits. Do NOT use for: executing notebook code.",
+                       ("notebook-summary",), get_notebook_summary),
+        ToolDefinition("compare_files", "Diffs two text files. Use for: config comparisons. Do NOT use for: binary model files.",
+                       ("file-diff",), compare_files),
+        ToolDefinition("compare_directories", "Compares two directory trees by content. Use for: output comparisons. Do NOT use for: lineage graphing.",
+                       ("dir-diff",), compare_directories),
+    ],
     }
 
 def _ok(**payload: Any) -> dict[str, Any]:
@@ -154,3 +190,5 @@ def register_tier_one_tools(app: FastMCP) -> None:
     app.tool(name="file_write")(file_write)
     app.tool(name="file_list")(file_list)
     app.tool(name="file_search")(file_search)
+    app.tool(name="analysis_directory")(analysis_directory)
+    app.tool(name="storage_report")(storage_report)
