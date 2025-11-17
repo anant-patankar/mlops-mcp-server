@@ -14,6 +14,7 @@ dependencies = [
     "deepdiff>=8.6.1",
     "fastmcp>=3.0.1",
     "gitpython>=3.1.46",
+    "nbformat>=5.10.4",
     "pandas>=3.0.1",
     "pathspec>=1.0.4",
     "pyarrow>=23.0.1",
