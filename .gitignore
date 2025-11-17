@@ -14,6 +14,7 @@ mlruns/
 wandb/
 .ipynb_checkpoints/
 .DS_Store/
+**/.DS_Store
 
 # Virtual environments
 .venv/
