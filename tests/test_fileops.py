@@ -8,12 +8,8 @@ from mlops_mcp.fileops import (
     delete_file,
     move_file,
     copy_file,
-    create_directory,
-    rename_file,
     list_files,
-    search_files,
     search_file_content,
-    get_disk_usage,
     batch_delete,
     get_operation_history,
 )

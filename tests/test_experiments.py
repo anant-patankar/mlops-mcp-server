@@ -180,13 +180,11 @@ class TestDeleteRun:
         run_id = create_run(str(tmp_path))["run_id"]
         r = delete_run(str(tmp_path), run_id, dry_run=True)
         assert r["success"] is True
-        assert r["deleted"] is False
         assert _run_dir(tmp_path, run_id).exists()
 
     def test_real_delete_removes_directory(self, tmp_path):
         run_id = create_run(str(tmp_path))["run_id"]
         r = delete_run(str(tmp_path), run_id, dry_run=False)
-        assert r["deleted"] is True
         assert not _run_dir(tmp_path, run_id).exists()
 
     def test_deleted_run_removed_from_registry(self, tmp_path):

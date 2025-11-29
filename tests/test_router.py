@@ -15,7 +15,6 @@ from mlops_mcp.router import (
 
 @pytest.fixture(autouse=True)
 def reset_router_state():
-    """Router uses module-level globals. Reset between every test."""
     _ACTIVE_MODULES.clear()
     _ACTIVE_MODULE_TOOLS.clear()
     _RUNTIME_REGISTERED_TOOLS.clear()

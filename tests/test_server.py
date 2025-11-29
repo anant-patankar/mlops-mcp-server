@@ -1,3 +1,4 @@
+import pytest
 from mlops_mcp.server import create_server
 from fastmcp import FastMCP
 
