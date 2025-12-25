@@ -7,6 +7,10 @@ from mlops_mcp.router import (
     activate_module,
     deactivate_module,
     register_tier_one_tools,
+    mlops_discover,
+    mlops_activate,
+    mlops_session_status,
+    reset_session_state,
     _ACTIVE_MODULES,
     _ACTIVE_MODULE_TOOLS,
     _RUNTIME_REGISTERED_TOOLS,
@@ -101,3 +105,67 @@ class TestTierOneTools:
         from mlops_mcp.router import _TIER_ONE_TOOLS
         for tool_name in _TIER_ONE_TOOLS:
             assert tool_name not in _RUNTIME_REGISTERED_TOOLS
+
+
+# ── mlops_discover ────────────────────────────────────────────────
+
+class TestMlopsDiscover:
+    def test_returns_success_with_modules_and_active_modules(self):
+        r = mlops_discover()
+        assert r["success"] is True
+        assert "modules" in r
+        assert "active_modules" in r
+
+    def test_active_modules_empty_before_activation(self):
+        r = mlops_discover()
+        assert r["active_modules"] == []
+
+
+# ── mlops_activate ────────────────────────────────────────────────
+
+class TestMlopsActivate:
+    def test_delegates_to_activate_module_correctly(self, mock_app):
+        r = mlops_activate("analysis")
+        assert r["success"] is True
+        assert "analysis" in r["active_modules"]
+
+    def test_unknown_module_returns_error(self, mock_app):
+        r = mlops_activate("no_such_module")
+        assert r["success"] is False
+
+
+# ── mlops_session_status ──────────────────────────────────────────
+
+class TestMlopsSessionStatus:
+    def test_returns_success_with_expected_keys(self, mock_app):
+        r = mlops_session_status()
+        assert r["success"] is True
+        assert "status" in r
+        assert "active_modules" in r
+        assert "active_module_count" in r
+        assert "runtime_registered_tool_count" in r
+
+    def test_active_module_count_zero_before_activation(self, mock_app):
+        r = mlops_session_status()
+        assert r["active_module_count"] == 0
+
+    def test_active_module_count_increments_after_activation(self, mock_app):
+        mlops_activate("analysis")
+        r = mlops_session_status()
+        assert r["active_module_count"] == 1
+
+
+# ── reset_session_state ───────────────────────────────────────────
+
+class TestResetSessionState:
+    def test_clears_active_modules_after_activation(self, mock_app):
+        mlops_activate("analysis")
+        assert len(_ACTIVE_MODULES) == 1
+        reset_session_state()
+        assert len(_ACTIVE_MODULES) == 0
+
+    def test_clears_runtime_registered_tools(self, mock_app):
+        mlops_activate("analysis")
+        assert len(_RUNTIME_REGISTERED_TOOLS) > 0
+        reset_session_state()
+        assert len(_RUNTIME_REGISTERED_TOOLS) == 0

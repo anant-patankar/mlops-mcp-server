@@ -182,6 +182,30 @@ def deactivate_module(module_name: str) -> dict[str, Any]:
     )
 
 
+def mlops_discover() -> dict[str, Any]:
+    modules = list_modules()
+    return _ok(modules=modules, active_modules=sorted(_ACTIVE_MODULES))
+
+
+def mlops_activate(module: str) -> dict[str, Any]:
+    return activate_module(module)
+
+
+def mlops_session_status() -> dict[str, Any]:
+    return _ok(
+        status="bootstrapped",
+        active_modules=sorted(_ACTIVE_MODULES),
+        active_module_count=len(_ACTIVE_MODULES),
+        runtime_registered_tool_count=len(_RUNTIME_REGISTERED_TOOLS),
+    )
+
+
+def reset_session_state() -> None:
+    _ACTIVE_MODULES.clear()
+    _ACTIVE_MODULE_TOOLS.clear()
+    _RUNTIME_REGISTERED_TOOLS.clear()
+
+
 def register_tier_one_tools(app: FastMCP) -> None:
     global _APP
     _APP = app

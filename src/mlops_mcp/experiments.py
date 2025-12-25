@@ -312,7 +312,7 @@ def list_runs(project_path: str = ".") -> dict[str, Any]:
                 }
             )
 
-        rows.sort(key=lambda row: row.get("updated_at") or "", reverse=True)
+        rows.sort(key=lambda r: r.get("updated_at") or "", reverse=True)
         return {
             "success": True,
             "project_path": str(Path(project_path).resolve()),
@@ -329,14 +329,14 @@ def compare_runs(project_path: str, run_ids: list[str]) -> dict[str, Any]:
 
     snapshots: dict[str, dict[str, Any]] = {}
     for run_id in run_ids:
-        row = get_run(project_path, run_id)
-        if not row.get("success"):
-            return row
-        latest_metrics = row["metrics"][-1] if row["metrics"] else {}
+        run_state = get_run(project_path, run_id)
+        if not run_state.get("success"):
+            return run_state
+        latest_metrics = run_state["metrics"][-1] if run_state["metrics"] else {}
         snapshots[run_id] = {
-            "params": row["params"],
+            "params": run_state["params"],
             "latest_metrics": latest_metrics,
-            "status": row["status"],
+            "status": run_state["status"],
         }
 
     diff: dict[str, Any]

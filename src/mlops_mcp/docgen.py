@@ -2,6 +2,7 @@ import ast
 from pathlib import Path
 from typing import Any
 
+from .envs import scan_imports
 from ._types import err as _fail
 from .analysis import analysis_directory
 from .datasets import profile_dataset
