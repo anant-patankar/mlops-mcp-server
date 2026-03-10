@@ -482,3 +482,20 @@ def export_runs_csv(project_path: str, output_path: str) -> dict[str, Any]:
         "row_count": int(frame.shape[0]),
     }
 
+
+def experiment_list_runs(project_path: str = ".") -> dict[str, Any]:
+    runs = list_runs(project_path)
+    if not runs.get("success"):
+        return runs
+
+    compact = [
+        {"run_id": r["run_id"], "updated_at": r.get("updated_at")}
+        for r in runs.get("runs", [])
+    ]
+    return {
+        "success": True,
+        "project_path": runs["project_path"],
+        "run_count": len(compact),
+        "runs": compact,
+    }
+
