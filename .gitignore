@@ -16,6 +16,7 @@ wandb/
 .DS_Store/
 .DS_Store
 **/.DS_Store
+repo_tree.md
 
 # Virtual environments
 .venv/
