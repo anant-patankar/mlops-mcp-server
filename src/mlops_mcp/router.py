@@ -684,3 +684,9 @@ def register_tier_one_tools(app: FastMCP) -> None:
     app.tool(name="experiment_list_runs")(experiment_list_runs)
     app.tool(name="model_list")(model_list)
     app.tool(name="storage_report")(storage_report)
+
+    for module_tools in TOOL_REGISTRY.values():
+        for tool in module_tools:
+            if tool.name not in _TIER_ONE_TOOLS:
+                app.tool(name=tool.name)(tool.handler)
+                _RUNTIME_REGISTERED_TOOLS.add(tool.name)
