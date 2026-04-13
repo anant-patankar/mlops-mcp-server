@@ -1,5 +1,9 @@
 ## MLOps MCP Server
 
+![PyPI - coming soon](https://img.shields.io/badge/PyPI-coming%20soon-orange)
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
+
 **MCP server for common MLOps workflows**
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that gives AI assistants like Claude direct access to MLOps workflows — experiment tracking, model registry, dataset management, pipeline orchestration, lineage tracing, and more. Wraps DVC, MLflow, and Git rather than replacing them.
@@ -27,6 +31,19 @@ Tools are registered in two tiers: a small set of always-on tools for quick file
 
 ## Installation
 
+### Install directly from GitHub (available now)
+
+```bash
+pip install git+https://github.com/anant-patankar/mlops-mcp-server.git
+```
+
+Using `uv`:
+```bash
+uv add git+https://github.com/anant-patankar/mlops-mcp-server.git
+```
+
+### Install from PyPI (coming soon)
+
 ```bash
 # Core install
 pip install mlops-mcp-server
@@ -50,6 +67,8 @@ uv add "mlops-mcp-server[mlflow,compare,notebooks,parquet]"
 ### Claude Desktop
 
 Add to your Claude Desktop MCP config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+First install the package, then add to your Claude Desktop config:
 
 ```json
 {
