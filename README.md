@@ -1,6 +1,6 @@
 ## MLOps MCP Server
 
-![PyPI - coming soon](https://img.shields.io/badge/PyPI-coming%20soon-orange)
+[![PyPI](https://img.shields.io/pypi/v/mlops-mcp-server)](https://pypi.org/project/mlops-mcp-server/)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
