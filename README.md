@@ -3,6 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/mlops-mcp-server)](https://pypi.org/project/mlops-mcp-server/)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-pink?logo=github-sponsors)](https://github.com/sponsors/anant-patankar)
 
 **MCP server for common MLOps workflows**
 
